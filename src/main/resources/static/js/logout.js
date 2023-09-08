@@ -16,7 +16,6 @@ window.onload = function () {
             .then((response) => {
                 if(response.ok){
                     return response.text().then((message) => {
-                        alert(message);
                         window.location.href = '/';
                     })
                 } else {

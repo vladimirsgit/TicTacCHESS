@@ -2,6 +2,8 @@ package com.tictacchess.backend.model;
 
 import jakarta.persistence.*;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -13,13 +15,14 @@ public class User {
     private String last_name;
     private String first_name;
     private String password;
-    private String email;
 
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.common;
 
+    private String email;
+    private Timestamp created_at = new Timestamp(System.currentTimeMillis());
     private String confirmation_code;
-    private Boolean confirmed_email = false;
+    private Boolean confirmedEmail = false;
 
     public Integer getId() {
         return id;
@@ -79,12 +82,12 @@ public class User {
         this.confirmation_code = confirmation_code;
     }
 
-    public Boolean getConfirmed_email() {
-        return confirmed_email;
+    public Boolean getConfirmedEmail() {
+        return confirmedEmail;
     }
 
-    public void setConfirmed_email(Boolean confirmed_email) {
-        this.confirmed_email = confirmed_email;
+    public void setConfirmedEmail(Boolean confirmed_email) {
+        this.confirmedEmail = confirmed_email;
     }
 
     public UserRole getRole() {
@@ -93,6 +96,13 @@ public class User {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+    public Timestamp getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(Timestamp timestamp) {
+        this.created_at = timestamp;
     }
 }
 
