@@ -4,11 +4,14 @@ import com.tictacchess.backend.model.User;
 import com.tictacchess.backend.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.boot.Banner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
+import java.util.Enumeration;
 import java.util.Objects;
 
 @Service
@@ -85,12 +88,15 @@ public class AuthService {
         if(user == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not found! Please try again!");
 
         if(bCryptPasswordEncoder.matches(password, user.getPassword())){
+            SessionService sessionService = new SessionService();
+            sessionService.setSessionData(user, httpSession);
 
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("Welcome! :)");
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Wrong password!");
 
     }
+
 
 
 }

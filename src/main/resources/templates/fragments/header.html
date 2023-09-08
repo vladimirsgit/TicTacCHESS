@@ -5,10 +5,15 @@
     <nav id="menu-nav-bar">
         <ul class="menu">
             <li class="nav-item"><a class="nav-link" href="/index"><span class="fa-solid fa-house"></span> Home</a></li>
-            <li class="nav-item" th:if="${user == null}"><a class="nav-link" href="/register"><span class="fa-solid fa-file-invoice"></span> Register</a></li>
             <li class="nav-item"><a class="nav-link" href="/tictactoe"><span class="fa-solid fa-x"></span> <span class="fa-solid fa-0"></span> Tic Tac Toe</a></li>
             <li class="nav-item"><a class="nav-link" href="/chess"><span class="fa-solid fa-chess"></span> Chess</a></li>
             <li class="nav-item"><a class="nav-link" href="/about"><span class="fa-solid fa-address-card"></span> About</a></li>
+            <li class="nav-item" th:if="${session.username == null}"><a class="nav-link" href="/login"><span class="fa-solid fa-right-to-bracket"></span> Log In</a></li>
+            <li class="nav-item" th:unless="${session.username != null}"><a class="nav-link" href="/register"><span class="fa-solid fa-file-invoice"></span> Register</a></li>
+            <li class="nav-item" th:if="${session.username != null}"><script src="/js/logout.js"></script><a id="logout-button" th:text="'Log Out [' + ${session.username} + ']'" class="nav-link" href="/"><span class="fa-solid fa-right-from-bracket"></span> Log Out</a></li>
+
+
+
         </ul>
     </nav>
 

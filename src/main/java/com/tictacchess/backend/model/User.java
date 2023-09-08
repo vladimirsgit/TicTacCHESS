@@ -13,19 +13,10 @@ public class User {
     private String last_name;
     private String first_name;
     private String password;
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
-    }
-
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private UserRole role = UserRole.common;
 
     private String confirmation_code;
     private Boolean confirmed_email = false;
@@ -94,6 +85,14 @@ public class User {
 
     public void setConfirmed_email(Boolean confirmed_email) {
         this.confirmed_email = confirmed_email;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 }
 

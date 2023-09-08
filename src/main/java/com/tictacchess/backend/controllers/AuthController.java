@@ -8,6 +8,7 @@ import com.tictacchess.backend.services.AuthService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -47,5 +48,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user, HttpSession httpSession){
         return authService.verifyLogIn(user.getUsername(), user.getPassword(), httpSession);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(HttpSession httpSession){
+        httpSession.invalidate();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("You have been logged out!");
     }
 }
