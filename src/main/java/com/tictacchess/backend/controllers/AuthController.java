@@ -3,9 +3,9 @@ package com.tictacchess.backend.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.tictacchess.backend.dto.PasswordConfirmationDto;
 import com.tictacchess.backend.model.User;
 import com.tictacchess.backend.services.AuthService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +44,8 @@ public class AuthController {
         }
     }
 
-//    @PostMapping("/login")
-//    public User loginUser(@RequestBody User user){
-//        r
-//    }
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody User user, HttpSession httpSession){
+        return authService.verifyLogIn(user.getUsername(), user.getPassword(), httpSession);
+    }
 }

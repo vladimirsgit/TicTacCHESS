@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:replace="~{fragments/head.html :: headFragment}">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <link rel="stylesheet" type="text/css" href="/css/reset.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/2cf2b179fe.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <header th:replace="~{fragments/header.html :: headerFragment}">
@@ -8,7 +14,7 @@
 <main>
     <div class="container mt-5">
         <h1 class="text-center">Registration Form</h1>
-        <form id="registration_form" action="/api/users/add" method="post">
+        <form id="registration_form" action="/api/auth/register" method="post">
             <div class="form-group">
                 <label for="last_name">Last name</label>
                 <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter your last name" required pattern="^[A-Za-z]{1,100}$">

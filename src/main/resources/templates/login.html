@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In</title>
+    <link rel="stylesheet" type="text/css" href="/css/reset.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/2cf2b179fe.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header th:replace="~{fragments/header.html :: headerFragment}"></header>
+    <main>
+        <div class="container mt-5">
+            <h1 style="text-align: center">Login</h1>
+            <form id="login-form" action="/api/auth/login" method="post">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" class="form-control" id="username" placeholder="Enter username" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="pwd">Password:</label>
+                    <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pswd">
+                </div>
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </form>
+        </div>
+    </main>
+    <script src="/static/js/login.js"></script>
+</body>
+</html>

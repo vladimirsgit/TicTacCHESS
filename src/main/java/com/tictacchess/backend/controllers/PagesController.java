@@ -15,4 +15,9 @@ public class PagesController {
         return "register";
     }
 
+    @GetMapping("/login")
+    public String loginForm(){
+        return "login";
+    }
+
 }
