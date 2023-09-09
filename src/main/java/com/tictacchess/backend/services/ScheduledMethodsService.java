@@ -25,7 +25,7 @@ public class ScheduledMethodsService {
         for (User user :
                 unconfirmedUsers) {
             long currentTime = System.currentTimeMillis();
-            if(user.getCreated_at().getTime() - currentTime > 1200000){
+            if(currentTime - user.getCreated_at().getTime() > 1200000){
                 userRepository.delete(user);
             }
         }
