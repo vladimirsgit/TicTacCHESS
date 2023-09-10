@@ -4,6 +4,7 @@ import com.tictacchess.backend.model.User;
 import com.tictacchess.backend.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -83,7 +84,8 @@ public class AuthService {
 
         User user = userRepository.findUserByUsername(username);
 
-        if(user == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User not found! Please try again!");
+        if(user == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid credentials!");
+        if(!user.getConfirmedEmail()) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Please confirm your email!");
 
         if(bCryptPasswordEncoder.matches(password, user.getPassword())){
             SessionService sessionService = new SessionService();
@@ -91,10 +93,8 @@ public class AuthService {
 
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("Welcome! :)");
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Wrong password!");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid credentials!");
 
     }
-
-
 
 }
