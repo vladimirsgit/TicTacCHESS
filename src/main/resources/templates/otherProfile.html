@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${user.username} + '\'s profile'"></title>
+    <link rel="stylesheet" type="text/css" href="/css/reset.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/2cf2b179fe.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header th:replace="~{fragments/header.html :: headerFragment}">
+    </header>
+    <main>
+        <div class="container mt-5">
+            <div class="card" style="color: black;"> <!-- Added inline style here for text color -->
+                <div class="card-body">
+                    <h5 class="card-title">Username: <span id="username" th:text="${user.username}">JohnDoe123</span></h5>
+                    <p class="card-text">User Role: <span id="userRole" th:text="${user.role}">Admin</span></p>
+                    <p class="card-text">Created At: <span id="createdAt" th:text="${user.createdAt}">2023-09-09 12:34:56</span></p>
+                    <button id="addFriendBtn" class="btn btn-primary">Add Friend</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

@@ -1,6 +1,8 @@
-window.onload = function () {
+window.addEventListener('load', function () {
+
     const form = document.getElementById("login-form");
 
+    if(form)
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -36,4 +38,4 @@ window.onload = function () {
             console.error('Fetch error:', err);
         })
     })
-}
+});

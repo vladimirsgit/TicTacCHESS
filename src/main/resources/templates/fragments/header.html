@@ -10,12 +10,10 @@
             <li class="nav-item"><a class="nav-link" href="/about"><span class="fa-solid fa-address-card"></span> About</a></li>
             <li class="nav-item" th:if="${session.username == null}"><a class="nav-link" href="/login"><span class="fa-solid fa-right-to-bracket"></span> Log In</a></li>
             <li class="nav-item" th:unless="${session.username != null}"><a class="nav-link" href="/register"><span class="fa-solid fa-file-invoice"></span> Register</a></li>
-            <li class="nav-item" th:if="${session.username != null}"><a id="logout-button" th:text="'Log Out [' + ${session.username} + ']'" class="nav-link" href="/"><span class="fa-solid fa-right-to-bracket"></span> Log Out</a></li>
-
-
-
+            <li class="nav-item" th:if="${session.username != null}"><a id="profile-button" class="nav-link" href="/profile"><span class="fa-solid fa-user"></span> <span th:text="'Profile [' + ${session.username} + ']'" ></span> </a></li>
+            <li class="nav-item" th:if="${session.username != null}"><a id="logout-button" class="nav-link" href="/"><span class="fa-solid fa-right-to-bracket"></span><span th:text="' Log Out [' + ${session.username} + ']'"></span> </a></li>
         </ul>
-        <script src="/js/logout.js"></script>
     </nav>
-
+    <script src="/js/logout.js"></script>
+    <script src="/js/profile.js"></script>
 </header>
