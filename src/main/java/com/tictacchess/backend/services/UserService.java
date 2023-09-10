@@ -50,6 +50,11 @@ public class UserService {
 
     public String showOtherProfile(String username, Model model){
         User user = userRepository.findUserByUsername(username);
+
+        if(user == null){
+            return "redirect:/404";
+        }
+
         UserDTO userDTO = new UserDTO();
 
         userDTO.setUsername(user.getUsername());

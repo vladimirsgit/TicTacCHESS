@@ -66,7 +66,7 @@ public class AuthService {
     }
 
     public String validateFields(String username, String last_name, String first_name, String email){
-        String regExUsername = "^[A-Za-z0-9#_.]{3,49}$";
+        String regExUsername = "^[A-Za-z0-9#_.]{3,10}$";
         String regExName = "^[A-Za-z]{1,100}$";
         String regExEmail = "^[A-Za-z0-9#_.-]+@[A-Za-z0-9-]+\\.com$";
 

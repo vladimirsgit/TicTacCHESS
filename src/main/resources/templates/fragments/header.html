@@ -10,7 +10,7 @@
             <li class="nav-item"><a class="nav-link" href="/about"><span class="fa-solid fa-address-card"></span> About</a></li>
             <li class="nav-item" th:if="${session.username == null}"><a class="nav-link" href="/login"><span class="fa-solid fa-right-to-bracket"></span> Log In</a></li>
             <li class="nav-item" th:unless="${session.username != null}"><a class="nav-link" href="/register"><span class="fa-solid fa-file-invoice"></span> Register</a></li>
-            <li class="nav-item" th:if="${session.username != null}"><a id="profile-button" class="nav-link" href="/profile"><span class="fa-solid fa-user"></span> <span th:text="'Profile [' + ${session.username} + ']'" ></span> </a></li>
+            <li class="nav-item" th:if="${session.username != null}"><a id="profile-button" class="nav-link" th:href="@{/profile/{username}(username=${session.username})}"><span class="fa-solid fa-user"></span> <span th:text="'Profile [' + ${session.username} + ']'" ></span> </a></li>
             <li class="nav-item" th:if="${session.username != null}"><a id="logout-button" class="nav-link" href="/"><span class="fa-solid fa-right-to-bracket"></span><span th:text="' Log Out [' + ${session.username} + ']'"></span> </a></li>
             <li class="nav-item">
                 <form action="/search" method="get" class="search-form">
@@ -23,5 +23,19 @@
         </ul>
     </nav>
     <script src="/js/logout.js"></script>
-    <script src="/js/profile.js"></script>
+<!--    <script src="/js/profile.js"></script>-->
+    <script>
+        const form = document.getElementsByClassName("search-form")[0];
+        form.addEventListener('submit', (e) =>{
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            let formDataJson ={};
+
+            formData.forEach((value, key) => {
+                formDataJson[key] = value;
+            })
+            window.location.href = '/profile/' + formDataJson.query.toString();
+        })
+    </script>
 </header>

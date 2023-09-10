@@ -18,7 +18,6 @@ export function sendFormToBackend(form, apiCall, locationReload){
                 },
                 body: JSON.stringify(formDataJson)
             }
-            console.log(requestOptions.body);
             fetch(apiCall, requestOptions)
                 .then((response) => {
                     if(response.ok){
