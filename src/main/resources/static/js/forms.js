@@ -1,4 +1,4 @@
-export function sendFormToBackend(form, apiCall){
+export function sendFormToBackend(form, apiCall, locationReload){
     if(form){
         form.addEventListener('submit', (e) => {
 
@@ -18,13 +18,13 @@ export function sendFormToBackend(form, apiCall){
                 },
                 body: JSON.stringify(formDataJson)
             }
-
+            console.log(requestOptions.body);
             fetch(apiCall, requestOptions)
                 .then((response) => {
                     if(response.ok){
                         return response.text().then((message) => {
                             alert(message);
-                            window.location.href = '/';
+                            window.location.href = locationReload;
                         });
                     } else{
                         return response.text().then((errorMessage) => {

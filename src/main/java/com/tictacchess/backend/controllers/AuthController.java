@@ -47,7 +47,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user, HttpSession httpSession){
-        System.out.println("HELLLLLLLLLLLLLLLLLLO");
         return authService.verifyLogIn(user.getUsername(), user.getPassword(), httpSession);
     }
 
@@ -56,4 +55,5 @@ public class AuthController {
         httpSession.invalidate();
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("You have been logged out!");
     }
+
 }

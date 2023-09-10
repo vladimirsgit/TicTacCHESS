@@ -12,6 +12,14 @@
             <li class="nav-item" th:unless="${session.username != null}"><a class="nav-link" href="/register"><span class="fa-solid fa-file-invoice"></span> Register</a></li>
             <li class="nav-item" th:if="${session.username != null}"><a id="profile-button" class="nav-link" href="/profile"><span class="fa-solid fa-user"></span> <span th:text="'Profile [' + ${session.username} + ']'" ></span> </a></li>
             <li class="nav-item" th:if="${session.username != null}"><a id="logout-button" class="nav-link" href="/"><span class="fa-solid fa-right-to-bracket"></span><span th:text="' Log Out [' + ${session.username} + ']'"></span> </a></li>
+            <li class="nav-item">
+                <form action="/search" method="get" class="search-form">
+                    <label>
+                        <input type="text" name="query" placeholder="Search users" class="search-input">
+                    </label>
+                    <button type="submit" class="search-button"><span class="fa-solid fa-magnifying-glass"></span> Search</button>
+                </form>
+            </li>
         </ul>
     </nav>
     <script src="/js/logout.js"></script>

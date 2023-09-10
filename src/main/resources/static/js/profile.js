@@ -16,7 +16,6 @@ window.addEventListener('load', function () {
                 .then((response) => {
                     if(response.ok){
                         return response.text().then((message) => {
-                            console.log(message)
                             window.location.href = `/profile/${message}`;
                         })
                     } else {
