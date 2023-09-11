@@ -1,6 +1,4 @@
 package com.tictacchess.services;
-
-import com.tictacchess.backend.exceptions.*;
 import com.tictacchess.exceptions.*;
 import com.tictacchess.model.User;
 import com.tictacchess.repository.UserRepository;
