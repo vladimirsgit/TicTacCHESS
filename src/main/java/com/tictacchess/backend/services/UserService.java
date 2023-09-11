@@ -4,6 +4,10 @@ import ch.qos.logback.core.joran.conditional.IfAction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tictacchess.backend.dto.UserDTO;
+import com.tictacchess.backend.exceptions.AuthDataInvalid;
+import com.tictacchess.backend.exceptions.DatabaseException;
+import com.tictacchess.backend.exceptions.UserAlreadyExistsException;
+import com.tictacchess.backend.exceptions.UserNotFoundException;
 import com.tictacchess.backend.model.User;
 import com.tictacchess.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -26,15 +30,20 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public ResponseEntity<String> confirmEmail(String username, String token){
+    public void confirmEmail(String username, String token){
         User user = userRepository.findUserByUsername(username);
-        if(user == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An error occurred");
-        if(Objects.equals(user.getConfirmation_code(), token)){
-            user.setConfirmedEmail(true);
+        if(user == null) throw new UserNotFoundException("No user found.");
+        if(user.getConfirmedEmail()) throw new UserAlreadyExistsException("Email is already confirmed!");
+
+        if(!Objects.equals(user.getConfirmation_code(), token)){
+            throw new AuthDataInvalid("Invalid data");
+        }
+
+        user.setConfirmedEmail(true);
+        try {
             userRepository.save(user);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Email confirmed!");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An error occurred");
+        } catch (Exception e){
+            throw new DatabaseException("An error occurred while saving the user");
         }
     }
 
@@ -51,7 +60,7 @@ public class UserService {
     public String showOtherProfile(String username, Model model){
         User user = userRepository.findUserByUsername(username);
 
-        if(user == null){
+        if(user == null || !user.getConfirmedEmail()){
             return "redirect:/404";
         }
 
@@ -69,7 +78,7 @@ public class UserService {
     public ResponseEntity<String> updateProfile(ObjectNode requestBodyJson){
 
         if(!userRepository.existsUserByUsername(requestBodyJson.get("username").asText())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid credentials");
+            throw new UserNotFoundException("User not found!");
         }
 
         if(!Objects.equals(requestBodyJson.get("new-password").asText(), "") && !Objects.equals(requestBodyJson.get("confirm-new-password").asText(), "")){

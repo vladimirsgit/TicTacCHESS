@@ -28,32 +28,29 @@ public class AuthController {
     public ResponseEntity<String> registerUser(@RequestBody ObjectNode requestBodyJson){
 
         String confirmPassword = requestBodyJson.get("confirmPassword").asText();
-
         requestBodyJson.remove("confirmPassword");
 
         ObjectMapper objectMapper = new ObjectMapper();
+        User user = objectMapper.convertValue(requestBodyJson, User.class);
 
-        try{
-            User user = objectMapper.convertValue(requestBodyJson, User.class);
-
-            if(!Objects.equals(confirmPassword, user.getPassword())){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password and confirm password fields do not match!");
-            }
-            return authService.registerUser(user);
-        } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        if(!Objects.equals(confirmPassword, user.getPassword())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password and confirm password fields do not match!");
         }
+        authService.registerUser(user);
+        return new ResponseEntity<>("User registered! Please check your email for validation! :)", HttpStatus.CREATED);
+
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user, HttpSession httpSession){
-        return authService.verifyLogIn(user.getUsername(), user.getPassword(), httpSession);
+        authService.verifyLogIn(user.getUsername(), user.getPassword(), httpSession);
+        return new ResponseEntity<>("Welcome! :)", HttpStatus.OK);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpSession httpSession){
         httpSession.invalidate();
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("You have been logged out!");
+        return new ResponseEntity<>("You have been logged out!", HttpStatus.ACCEPTED);
     }
 
 }

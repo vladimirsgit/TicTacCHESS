@@ -1,12 +1,10 @@
 package com.tictacchess.backend.services;
 
+import com.tictacchess.backend.exceptions.*;
 import com.tictacchess.backend.model.User;
 import com.tictacchess.backend.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
-import org.apache.coyote.Response;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,21 +24,20 @@ public class AuthService {
     }
 
 
-    public ResponseEntity<String> registerUser(User user){
+    public void registerUser(User user){
         String validateFieldsResponse = validateFields(user.getUsername(), user.getLast_name(), user.getFirst_name(), user.getEmail());
 
         if(!Objects.equals(validateFieldsResponse, "null")){
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validateFieldsResponse);
+            throw new AuthDataInvalid(validateFieldsResponse);
         }
 
         if(userRepository.existsUserByUsername(user.getUsername())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists!");
+            throw new UserAlreadyExistsException("Username taken!");
         }
 
         String hashedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
         user.setConfirmation_code(TokenGenerator.generateSecureToken(64));
-
 
         try {
             String htmlContent = "<div style=\"font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333;\">" +
@@ -55,13 +52,14 @@ public class AuthService {
 
             emailService.sendEmail(user.getEmail(), "Confirm your email", htmlContent);
         } catch (MessagingException messagingException){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There was a problem with the email, please try again later");
+            throw new EmailException("There was a problem with the email, please try again later.");
         }
 
-        System.out.println(user.getCreated_at());
-
-        userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body("You have been registered! Please check your email for validation!");
+        try {
+            userRepository.save(user);
+        } catch (Exception e){
+            throw new DatabaseException("A database error occurred while saving the user");
+        }
 
     }
 
@@ -80,21 +78,19 @@ public class AuthService {
         return "null";
     }
 
-    public ResponseEntity<String> verifyLogIn(String username, String password, HttpSession httpSession){
+    public void verifyLogIn(String username, String password, HttpSession httpSession){
 
         User user = userRepository.findUserByUsername(username);
 
-        if(user == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid credentials!");
-        if(!user.getConfirmedEmail()) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Please confirm your email!");
+        if(user == null) throw new UserNotFoundException("Invalid credentials!");
 
-        if(bCryptPasswordEncoder.matches(password, user.getPassword())){
-            SessionService sessionService = new SessionService();
-            sessionService.setSessionData(user, httpSession);
+        if(!user.getConfirmedEmail()) throw new EmailException("Please confirm your email!");
 
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Welcome! :)");
+        if(!bCryptPasswordEncoder.matches(password, user.getPassword())){
+            throw new AuthDataInvalid("Invalid credentials!");
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid credentials!");
-
+        SessionService sessionService = new SessionService();
+        sessionService.setSessionData(user, httpSession);
     }
 
 }
