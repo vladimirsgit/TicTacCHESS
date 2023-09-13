@@ -25,12 +25,11 @@ public class AuthService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.emailService = emailService;
     }
-
-
+    //registering the user
     public ResponseEntity<String> registerUser(ObjectNode requestBodyJson){
         User user = verifyRegister(requestBodyJson);
         String hashedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-
+        //we encode the password and generate a token for email confirmation
         user.setPassword(hashedPassword);
         user.setConfirmation_code(TokenGenerator.generateSecureToken(64));
 
@@ -43,7 +42,7 @@ public class AuthService {
         }
         return new ResponseEntity<>("User registered! Please check your email for validation! :)", HttpStatus.CREATED);
     }
-
+    //registration field validation using regEx
     public String validateFields(String username, String last_name, String first_name, String email){
         String regExUsername = "^[A-Za-z0-9#_.]{3,10}$";
         String regExName = "^[A-Za-z]{1,100}$";
@@ -58,19 +57,21 @@ public class AuthService {
         }
         return "null";
     }
-
+    //checks registration data
     public User verifyRegister(ObjectNode requestBodyJson){
         String confirmPassword = requestBodyJson.get("confirmPassword").asText();
         requestBodyJson.remove("confirmPassword");
-
+        //we remove the confirmPassword property from the JSON so we can map the requestBody to the user, as the user doesnt have that field
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.convertValue(requestBodyJson, User.class);
 
         if(!Objects.equals(confirmPassword, user.getPassword())){
             throw new AuthDataInvalid("Password and confirm password fields do not match!");
         }
-        String validateFieldsResponse = validateFields(user.getUsername(), user.getLast_name(), user.getFirst_name(), user.getEmail());
 
+        //we validate all the fields with regEx
+        String validateFieldsResponse = validateFields(user.getUsername(), user.getLast_name(), user.getFirst_name(), user.getEmail());
+        //if the return value of validate fields is not null, means something went wrong
         if(!Objects.equals(validateFieldsResponse, "null")){
             throw new AuthDataInvalid(validateFieldsResponse);
         }

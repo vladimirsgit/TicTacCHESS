@@ -17,6 +17,7 @@ public class ScheduledMethodsService {
         this.userRepository = userRepository;
     }
 
+    //if the user has not confirmed his email after 20 minutes, it means we can delete him from our database
     @Scheduled(fixedRate = 1200000)
     public void checkAndDeleteLateUsers(){
         ArrayList<User> unconfirmedUsers = userRepository.findUsersByConfirmedEmailFalse();

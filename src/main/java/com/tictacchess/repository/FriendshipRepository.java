@@ -7,5 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FriendshipRepository extends JpaRepository<Friendship, Friendship.FriendshipId> {
     boolean existsFriendshipByRecipientIdAndRequesterId(Integer recipientId, Integer RequesterId);
-    boolean existsFriendshipByRequesterIdAndPendingIsTrue(Integer requesterId);
+    boolean existsFriendshipByRequesterIdAndRecipientIdAndPendingIsTrue(Integer requesterId, Integer recipientId);
+    boolean existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedIsFalse(Integer requesterId, Integer recipientId);
+    boolean existsFriendshipByRequesterIdAndRecipientIdAndDeclinedIsTrue(Integer requesterId, Integer recipientId);
 }

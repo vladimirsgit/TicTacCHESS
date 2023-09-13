@@ -25,8 +25,8 @@
                     </span>
 
                     <span th:if="${recipient}">
-                        <button class="btn btn-success">Accept friend request</button>
-                        <button class="btn btn-danger">Decline friend request</button>
+                        <button id="acceptFriendBtn" class="btn btn-success">Accept friend request</button>
+                        <button id="declineFriendBtn" class="btn btn-danger">Decline friend request</button>
                     </span>
 
 
@@ -35,5 +35,6 @@
         </div>
     </main>
     <script src="/js/addFriend.js"></script>
+    <script src="/js/acceptOrDeclineFriend.js"></script>
 </body>
 </html>
