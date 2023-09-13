@@ -35,8 +35,4 @@ public class PagesController {
     public String showProfileData(@PathVariable String username, HttpSession httpSession, Model model){
         return userService.whatProfileDataToShow(username, httpSession, model);
     }
-//    @GetMapping("/profile")
-//    public ResponseEntity<String> getProfile(HttpSession httpSession){
-//        return ResponseEntity.status(HttpStatus.OK).body(httpSession.getAttribute("username").toString());
-//    }
 }

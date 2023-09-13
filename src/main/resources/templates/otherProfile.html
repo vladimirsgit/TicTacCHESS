@@ -13,16 +13,27 @@
     </header>
     <main>
         <div class="container mt-5">
-            <div class="card" style="color: black;"> <!-- Added inline style here for text color -->
+            <div class="card" style="color: black;">
                 <div class="card-body">
-                    <h5 class="card-title">Username: <span id="username" th:text="${user.username}">JohnDoe123</span></h5>
-                    <p class="card-text">User Role: <span id="userRole" th:text="${user.role}">Admin</span></p>
-                    <p class="card-text">Created At: <span id="createdAt" th:text="${user.createdAt}">2023-09-09 12:34:56</span></p>
-                    <button id="addFriendBtn" class="btn btn-primary">Add Friend</button>
+                    <h5 class="card-title">Username: <span id="username" th:text="${user.username}"></span></h5>
+                    <p class="card-text">User Role: <span id="userRole" th:text="${user.role}"></span></p>
+                    <p class="card-text">Created At: <span id="createdAt" th:text="${user.createdAt}"></span></p>
+                    <button th:if="${requester == null && recipient == null}" id="addFriendBtn" class="btn btn-primary">Add Friend</button>
+
+                    <span th:if="${requester}">
+                        <button id="requestSentBtn" class="btn btn-secondary">Friend request sent</button>
+                    </span>
+
+                    <span th:if="${recipient}">
+                        <button class="btn btn-success">Accept friend request</button>
+                        <button class="btn btn-danger">Decline friend request</button>
+                    </span>
+
+
                 </div>
             </div>
         </div>
     </main>
-
+    <script src="/js/addFriend.js"></script>
 </body>
 </html>

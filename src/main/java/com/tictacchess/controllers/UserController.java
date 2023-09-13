@@ -18,8 +18,7 @@ public class UserController {
 
     @GetMapping("/{username}/{token}")
     public ResponseEntity<String> confirmEmail(@PathVariable String username, @PathVariable String token){
-        userService.confirmEmail(username, token);
-        return new ResponseEntity<>("Email confirmed!", HttpStatus.ACCEPTED);
+        return userService.confirmEmail(username, token);
     }
 
     @PostMapping("/updateProfile")
@@ -27,5 +26,4 @@ public class UserController {
     public ResponseEntity<String> updateProfile(@RequestBody ObjectNode requestBodyJson){
         return userService.updateProfile(requestBodyJson);
     }
-
 }

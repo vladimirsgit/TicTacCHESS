@@ -19,8 +19,6 @@ public class FriendshipController {
 
     @PostMapping("/addFriend")
     public ResponseEntity<String> sendFriendshipRequestData(@RequestBody FriendshipRequestDTO friendshipRequestDTO){
-        friendshipService.addFriend(friendshipRequestDTO.getRequesterUsername(), friendshipRequestDTO.getRecipientUsername());
-        return new ResponseEntity<>("Friend request sent!", HttpStatus.OK);
-
+        return friendshipService.addFriend(friendshipRequestDTO.getRequesterUsername(), friendshipRequestDTO.getRecipientUsername());
     }
 }

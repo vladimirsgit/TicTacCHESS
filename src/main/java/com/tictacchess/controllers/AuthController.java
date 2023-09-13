@@ -23,31 +23,17 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody ObjectNode requestBodyJson){
-
-        String confirmPassword = requestBodyJson.get("confirmPassword").asText();
-        requestBodyJson.remove("confirmPassword");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = objectMapper.convertValue(requestBodyJson, User.class);
-
-        if(!Objects.equals(confirmPassword, user.getPassword())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password and confirm password fields do not match!");
-        }
-        authService.registerUser(user);
-        return new ResponseEntity<>("User registered! Please check your email for validation! :)", HttpStatus.CREATED);
-
+        return authService.registerUser(requestBodyJson);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user, HttpSession httpSession){
-        authService.verifyLogIn(user.getUsername(), user.getPassword(), httpSession);
-        return new ResponseEntity<>("Welcome! :)", HttpStatus.OK);
+        return authService.verifyLogIn(user.getUsername(), user.getPassword(), httpSession);
+
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpSession httpSession){
-        httpSession.invalidate();
-        return new ResponseEntity<>("You have been logged out!", HttpStatus.ACCEPTED);
+        return authService.logoutUser(httpSession);
     }
-
 }

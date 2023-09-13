@@ -1,9 +1,13 @@
 package com.tictacchess.services;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tictacchess.exceptions.*;
 import com.tictacchess.model.User;
 import com.tictacchess.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,43 +27,21 @@ public class AuthService {
     }
 
 
-    public void registerUser(User user){
-        String validateFieldsResponse = validateFields(user.getUsername(), user.getLast_name(), user.getFirst_name(), user.getEmail());
-
-        if(!Objects.equals(validateFieldsResponse, "null")){
-            throw new AuthDataInvalid(validateFieldsResponse);
-        }
-
-        if(userRepository.existsUserByUsername(user.getUsername())){
-            throw new UserAlreadyExistsException("Username taken!");
-        }
-
+    public ResponseEntity<String> registerUser(ObjectNode requestBodyJson){
+        User user = verifyRegister(requestBodyJson);
         String hashedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+
         user.setPassword(hashedPassword);
         user.setConfirmation_code(TokenGenerator.generateSecureToken(64));
 
-        try {
-            String htmlContent = "<div style=\"font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333;\">" +
-                    "<div style=\"width: 100%; margin: auto; background-color: #fff; padding: 20px; border-radius: 8px;\">" +
-                    "<h1>Hi there!</h1>" +
-                    "<p> Welcome to TicTacChess</p>" +
-                    "<p>To confirm your email, please click the link below:</p>" +
-                    "<a href=\"http://www.localhost:8080/user/" +
-                    user.getUsername() + "/" + user.getConfirmation_code() + "\" style=\"background-color: #007bff; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; margin: 10px 2px; cursor: pointer; border-radius: 4px;\">Confirm Email</a>" +
-                    "</div>" +
-                    "</div>";
-
-            emailService.sendEmail(user.getEmail(), "Confirm your email", htmlContent);
-        } catch (MessagingException messagingException){
-            throw new EmailException("There was a problem with the email, please try again later.");
-        }
+        sendRegisteringEmail(user);
 
         try {
             userRepository.save(user);
         } catch (Exception e){
             throw new DatabaseException("A database error occurred while saving the user");
         }
-
+        return new ResponseEntity<>("User registered! Please check your email for validation! :)", HttpStatus.CREATED);
     }
 
     public String validateFields(String username, String last_name, String first_name, String email){
@@ -77,19 +59,63 @@ public class AuthService {
         return "null";
     }
 
-    public void verifyLogIn(String username, String password, HttpSession httpSession){
+    public User verifyRegister(ObjectNode requestBodyJson){
+        String confirmPassword = requestBodyJson.get("confirmPassword").asText();
+        requestBodyJson.remove("confirmPassword");
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = objectMapper.convertValue(requestBodyJson, User.class);
+
+        if(!Objects.equals(confirmPassword, user.getPassword())){
+            throw new AuthDataInvalid("Password and confirm password fields do not match!");
+        }
+        String validateFieldsResponse = validateFields(user.getUsername(), user.getLast_name(), user.getFirst_name(), user.getEmail());
+
+        if(!Objects.equals(validateFieldsResponse, "null")){
+            throw new AuthDataInvalid(validateFieldsResponse);
+        }
+
+        if(userRepository.existsUserByUsername(user.getUsername())){
+            throw new UserAlreadyExistsException("Username taken!");
+        }
+        return user;
+    }
+
+    public void sendRegisteringEmail(User user){
+        try {
+            String htmlContent = "<div style=\"font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333;\">" +
+                    "<div style=\"width: 100%; margin: auto; background-color: #fff; padding: 20px; border-radius: 8px;\">" +
+                    "<h1>Hi there!</h1>" +
+                    "<p> Welcome to TicTacChess</p>" +
+                    "<p>To confirm your email, please click the link below:</p>" +
+                    "<a href=\"http://www.localhost:8080/user/" +
+                    user.getUsername() + "/" + user.getConfirmation_code() + "\" style=\"background-color: #007bff; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; margin: 10px 2px; cursor: pointer; border-radius: 4px;\">Confirm Email</a>" +
+                    "</div>" +
+                    "</div>";
+
+            emailService.sendEmail(user.getEmail(), "Confirm your email", htmlContent);
+        } catch (MessagingException messagingException){
+            throw new EmailException("There was a problem with the email, please try again later.");
+        }
+    }
+
+    public ResponseEntity<String> verifyLogIn(String username, String password, HttpSession httpSession) {
         User user = userRepository.findUserByUsername(username);
 
-        if(user == null) throw new UserNotFoundException("Invalid credentials!");
+        if (user == null) throw new UserNotFoundException("Invalid credentials!");
+        if (!user.getConfirmedEmail()) throw new EmailException("Please confirm your email!");
 
-        if(!user.getConfirmedEmail()) throw new EmailException("Please confirm your email!");
-
-        if(!bCryptPasswordEncoder.matches(password, user.getPassword())){
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new AuthDataInvalid("Invalid credentials!");
         }
         SessionService sessionService = new SessionService();
         sessionService.setSessionData(user, httpSession);
+
+        return new ResponseEntity<>("Welcome! :)", HttpStatus.OK);
     }
 
+    public ResponseEntity<String> logoutUser(HttpSession httpSession){
+        httpSession.invalidate();
+        return new ResponseEntity<>("You have been logged out!", HttpStatus.ACCEPTED);
+    }
 }

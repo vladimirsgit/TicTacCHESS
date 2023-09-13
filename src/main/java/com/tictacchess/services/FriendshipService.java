@@ -7,6 +7,8 @@ import com.tictacchess.model.Friendship;
 import com.tictacchess.model.User;
 import com.tictacchess.repository.FriendshipRepository;
 import com.tictacchess.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -20,7 +22,7 @@ public class FriendshipService {
         this.friendshipRepository = friendshipRepository;
     }
 
-    public void addFriend(String requesterUsername, String recipientUsername){
+    public ResponseEntity<String> addFriend(String requesterUsername, String recipientUsername){
         User requester = userRepository.findUserByUsername(requesterUsername);
         User recipient = userRepository.findUserByUsername(recipientUsername);
 
@@ -36,6 +38,7 @@ public class FriendshipService {
         } catch (Exception e){
             throw new DatabaseException("A database error occurred while trying to save the friendship request.");
         }
+        return new ResponseEntity<>("Friend request sent!", HttpStatus.OK);
     }
 
     public boolean checkIfFriendshipExists(Integer requesterId, Integer recipientId){
