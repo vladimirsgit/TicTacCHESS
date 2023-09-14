@@ -1,5 +1,6 @@
 package com.tictacchess.services;
 
+import com.tictacchess.model.UserRole;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;

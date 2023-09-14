@@ -104,7 +104,6 @@ public class FriendshipService {
         Friendship friendship = new Friendship(requester.getId(), recipient.getId());
         friendship.setPending(false);
         if(action.equals(ACTION_DECLINE)){
-            System.out.println("AICI DAM DECLINE!");
             friendship.setDeclined(true);
         }
         try {

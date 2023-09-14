@@ -59,6 +59,9 @@ public class AuthService {
     }
     //checks registration data
     public User verifyRegister(ObjectNode requestBodyJson){
+        if(requestBodyJson == null || requestBodyJson.get("confirmPassword") == null){
+            throw new AuthDataInvalid("Empty fields.");
+        }
         String confirmPassword = requestBodyJson.get("confirmPassword").asText();
         requestBodyJson.remove("confirmPassword");
         //we remove the confirmPassword property from the JSON so we can map the requestBody to the user, as the user doesnt have that field
