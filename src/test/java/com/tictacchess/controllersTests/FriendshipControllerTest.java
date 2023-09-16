@@ -1,15 +1,14 @@
 package com.tictacchess.controllersTests;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tictacchess.controllers.AuthController;
-import com.tictacchess.exceptions.AuthDataInvalid;
-import com.tictacchess.services.AuthService;
-import jakarta.servlet.http.HttpSession;
+import com.tictacchess.controllers.FriendshipController;
+import com.tictacchess.model.Friendship;
+import com.tictacchess.services.FriendshipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,16 +20,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(FriendshipController.class)
 @ExtendWith(MockitoExtension.class)
-public class AuthControllerTest {
+public class FriendshipControllerTest {
     @MockBean
-    private AuthService authService;
+    private FriendshipService friendshipService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,40 +36,38 @@ public class AuthControllerTest {
     private String json;
     @BeforeEach
     public void setUp(){
-        json = "{\"username\":\"john\",\"password\":\"12345\"}";
+        json = "{\"recipientUsername\":\"john\",\"requesterUsername\":\"12345\"}";
     }
-
     @Test
-    public void testRegisterUser() throws Exception {
-        when(authService.registerUser(any(ObjectNode.class))).thenReturn(new ResponseEntity<>("User registered! Please check your email for validation! :)", HttpStatus.CREATED));
+    public void testAddFriendPath() throws Exception {
+        when(friendshipService.addFriend(any(), any())).thenReturn(new ResponseEntity<>("Friend request sent!", HttpStatus.OK));
 
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("User registered! Please check your email for validation! :)"));
-    }
-
-    @Test
-    public void testLoginIsOk() throws Exception {
-        when(authService.verifyLogIn(any(), any(HttpSession.class))).thenReturn(new ResponseEntity<>("Welcome! :)", HttpStatus.OK));
-
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/friends/addFriend")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Welcome! :)"));
-
+                .andExpect(content().string("Friend request sent!"));
     }
 
     @Test
-    public void testLoginFailed() throws Exception {
-        when(authService.verifyLogIn(any(), any(HttpSession.class))).thenThrow(new AuthDataInvalid("Invalid credentials!"));
+    public void testAcceptFriendshipPath() throws Exception {
+        when(friendshipService.acceptFriendship(anyString(), any())).thenReturn(new ResponseEntity<>("Friendship accepted", HttpStatus.OK));
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/friends/accept")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid credentials!"));
+                .andExpect(status().isOk()).
+                andExpect(content().string("Friendship accepted"));
+    }
+
+    @Test
+    public void testDeclineFriendshipPath() throws Exception {
+        when(friendshipService.declineFriendship(anyString(), any())).thenReturn(new ResponseEntity<>("Friendship declined", HttpStatus.OK));
+
+        mockMvc.perform(post("/api/friends/decline")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Friendship declined"));
     }
 }

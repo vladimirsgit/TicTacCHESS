@@ -103,8 +103,10 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<String> verifyLogIn(String username, String password, HttpSession httpSession) {
-        User user = userRepository.findUserByUsername(username);
+    public ResponseEntity<String> verifyLogIn(User possibleUser, HttpSession httpSession) {
+        if(possibleUser == null) throw new AuthDataInvalid("Invalid data");
+        String password = possibleUser.getPassword();
+        User user = userRepository.findUserByUsername(possibleUser.getUsername());
 
         if (user == null) throw new UserNotFoundException("Invalid credentials!");
         if (!user.getConfirmedEmail()) throw new EmailException("Please confirm your email!");
