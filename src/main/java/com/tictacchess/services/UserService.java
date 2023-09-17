@@ -68,7 +68,6 @@ public class UserService {
         if(userToShow == null || !userToShow.getConfirmedEmail()){
             return "redirect:/404";
         }
-
         //here we use a data transfer object to create the user's profile
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername(userToShow.getUsername());
@@ -90,7 +89,6 @@ public class UserService {
         if(!Objects.equals(requestBodyJson.get("new-password").asText(), "") && !Objects.equals(requestBodyJson.get("confirm-new-password").asText(), "")){
             return updateProfileWithNewPassword(requestBodyJson);
         }
-
         //if we arrived here, it means the user only wants to update his name
         String username = requestBodyJson.get("username").asText();
         User user = userRepository.findUserByUsername(username);
@@ -107,7 +105,7 @@ public class UserService {
         } catch (Exception e){
             throw new DatabaseException("Database exception when updating profile");
         }
-        return new ResponseEntity<>("Profiled updated!", HttpStatus.OK);
+        return new ResponseEntity<>("Profile updated!", HttpStatus.OK);
     }
     //updating profile + new password
     public ResponseEntity<String> updateProfileWithNewPassword(ObjectNode requestBodyJson) {
@@ -136,7 +134,7 @@ public class UserService {
         } catch (Exception e){
             throw new DatabaseException("Database exception when updating profile");
         }
-        return new ResponseEntity<>("Profiled updated!", HttpStatus.OK);
+        return new ResponseEntity<>("Profile updated!", HttpStatus.OK);
     }
     //we check to see whos the requester and whos the recipient
     public void setFriendshipModelData(UserDTO userDTO, User userToSee, User userToShow, Model model){

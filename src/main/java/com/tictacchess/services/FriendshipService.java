@@ -71,26 +71,6 @@ public class FriendshipService {
         return new ResponseEntity<>("Friend request declined!", HttpStatus.OK);
 
     }
-    public void validateFriendshipAcceptanceOrDeclinationData(User requester, User recipient, String action) {
-        if (requester == null) {
-            throw new UserNotFoundException("User does not exist!");
-        }
-        //then we make sure that the request exists
-        if (!friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsTrue(requester.getId(), recipient.getId())) {
-            String errMessage = "You do not have a request to decline";
-            if(action.equals(ACTION_ACCEPT)){
-                errMessage = "No friend request available";
-            }
-            throw new AddFriendException(errMessage);
-        }
-        //checking if the request hasnt already been declined/accepted
-        if (friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndDeclinedIsTrue(requester.getId(), recipient.getId())) {
-            throw new AddFriendException("Friendship request already declined!");
-        }
-        if (friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedIsFalse(requester.getId(), recipient.getId())) {
-            throw new AddFriendException("You are already friends!");
-        }
-    }
 
     public void checkFriendshipDataAndSetNecessaryActions(String requesterUsername, HttpSession httpSession, String action){
         if (httpSession.getAttribute("username") == null) {
@@ -112,6 +92,28 @@ public class FriendshipService {
             throw new DatabaseException("Database error while saving user");
         }
     }
+
+    public void validateFriendshipAcceptanceOrDeclinationData(User requester, User recipient, String action) {
+        if (requester == null) {
+            throw new UserNotFoundException("User does not exist!");
+        }
+        //then we make sure that the request exists
+        if (!friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsTrue(requester.getId(), recipient.getId())) {
+            String errMessage = "You do not have a request to decline";
+            if(action.equals(ACTION_ACCEPT)){
+                errMessage = "No friend request available";
+            }
+            throw new AddFriendException(errMessage);
+        }
+        //checking if the request hasnt already been declined/accepted
+        if (friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndDeclinedIsTrue(requester.getId(), recipient.getId())) {
+            throw new AddFriendException("Friendship request already declined!");
+        }
+        if (friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedIsFalse(requester.getId(), recipient.getId())) {
+            throw new AddFriendException("You are already friends!");
+        }
+    }
+
     //we make sure that there isnt a pending or accepted friendship
     public boolean checkIfFriendshipExists(Integer requesterId, Integer recipientId){
         return friendshipRepository.existsFriendshipByRecipientIdAndRequesterId(recipientId, requesterId)
