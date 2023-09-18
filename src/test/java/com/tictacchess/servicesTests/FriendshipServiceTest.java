@@ -2,7 +2,7 @@ package com.tictacchess.servicesTests;
 
 import com.tictacchess.exceptions.AddFriendException;
 import com.tictacchess.exceptions.DatabaseException;
-import com.tictacchess.exceptions.FriendshipAlreadyExistsException;
+import com.tictacchess.exceptions.FriendshipException;
 import com.tictacchess.exceptions.UserNotFoundException;
 import com.tictacchess.model.Friendship;
 import com.tictacchess.model.User;
@@ -83,7 +83,7 @@ public class FriendshipServiceTest {
         when(httpSession.getAttribute(any())).thenReturn("not null");
         when(userRepository.findUserByUsername(any())).thenReturn(user);
 
-        FriendshipAlreadyExistsException thrownException = assertThrows(FriendshipAlreadyExistsException.class, () -> {
+        FriendshipException thrownException = assertThrows(FriendshipException.class, () -> {
             friendshipService.addFriend("", httpSession);
         });
         assertEquals("Friendship or friend request already exists!", thrownException.getMessage());

@@ -2,8 +2,12 @@ package com.tictacchess.repository;
 
 import com.tictacchess.model.Friendship;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
 
 @Repository
 public interface FriendshipRepository extends JpaRepository<Friendship, Friendship.FriendshipId> {
@@ -15,4 +19,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Friendsh
     boolean existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedIsFalse(Integer requesterId, Integer recipientId);
     //checking to see if the friend request was declined
     boolean existsFriendshipByRequesterIdAndRecipientIdAndDeclinedIsTrue(Integer requesterId, Integer recipientId);
+    @Modifying
+    @Query("DELETE FROM Friendship WHERE requesterId = :requesterId AND recipientId = :recipientId")
+    void deleteFriendshipByRequesterIdAndRecipientId(@Param("requesterId") Integer requesterId, @Param("recipientId") Integer recipientId);
+    boolean existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedTrue(Integer requesterId, Integer recipientId);
+    ArrayList<Friendship> findFriendshipsByDeclinedTrue();
 }

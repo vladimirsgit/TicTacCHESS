@@ -22,6 +22,11 @@ public class FriendshipController {
         return friendshipService.addFriend(friendshipRequestDTO.getRecipientUsername(), httpSession);
     }
 
+    @PostMapping("/cancelRequest")
+    public ResponseEntity<String> cancelRequest(@RequestBody FriendshipRequestDTO friendshipRequestDTO, HttpSession httpSession){
+        return friendshipService.cancelRequest(friendshipRequestDTO.getRecipientUsername(), httpSession);
+    }
+
     @PostMapping("/accept")
     public ResponseEntity<String> acceptFriendship(@RequestBody FriendshipRequestDTO friendshipRequestDTO, HttpSession httpSession){
         return friendshipService.acceptFriendship(friendshipRequestDTO.getRequesterUsername(), httpSession);

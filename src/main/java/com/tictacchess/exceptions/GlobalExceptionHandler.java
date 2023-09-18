@@ -13,8 +13,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(FriendshipAlreadyExistsException.class)
-    public ResponseEntity<String> handleFriendshipAlreadyExistsException(FriendshipAlreadyExistsException ex){
+    @ExceptionHandler(FriendshipException.class)
+    public ResponseEntity<String> handleFriendshipAlreadyExistsException(FriendshipException ex){
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 

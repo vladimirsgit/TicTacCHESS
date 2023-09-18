@@ -18,8 +18,9 @@
                     <h5 class="card-title">Username: <span id="username" th:text="${user.username}"></span></h5>
                     <p class="card-text">User Role: <span id="userRole" th:text="${user.role}"></span></p>
                     <p class="card-text">Created At: <span id="createdAt" th:text="${user.createdAt}"></span></p>
-                    <button th:if="${requester == null && recipient == null}" id="addFriendBtn" class="btn btn-primary">Add Friend</button>
-
+                    <button th:if="${userToShowDeclinedRequest}" class="btn btn-info">Your friend request was declined! Wait at least 24 hours before sending another request.</button>
+                    <button th:if="${userToSeeDeclinedRequest}" class="btn btn-info">You declined their request! Wait at least 24 hours before sending a request.</button>
+                    <button th:if="${requester == null && recipient == null && userToShowDeclinedRequest == null && userToSeeDeclinedRequest == null}" id="addFriendBtn" class="btn btn-primary">Add Friend</button>
                     <span th:if="${requester}">
                         <button id="requestSentBtn" class="btn btn-secondary">Friend request sent</button>
                     </span>

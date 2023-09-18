@@ -2,16 +2,19 @@ package com.tictacchess.services;
 
 import com.tictacchess.exceptions.AddFriendException;
 import com.tictacchess.exceptions.DatabaseException;
-import com.tictacchess.exceptions.FriendshipAlreadyExistsException;
+import com.tictacchess.exceptions.FriendshipException;
 import com.tictacchess.exceptions.UserNotFoundException;
 import com.tictacchess.model.Friendship;
 import com.tictacchess.model.User;
 import com.tictacchess.repository.FriendshipRepository;
 import com.tictacchess.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 
 
 @Service
@@ -41,6 +44,39 @@ public class FriendshipService {
         }
         return new ResponseEntity<>("Friend request sent!", HttpStatus.OK);
     }
+    @Transactional
+    public ResponseEntity<String> cancelRequest(String recipientUsername, HttpSession httpSession){
+        validateFriendRequestCancelData(recipientUsername, httpSession);
+
+        User requester = userRepository.findUserByUsername(httpSession.getAttribute("username").toString());
+        User recipient = userRepository.findUserByUsername(recipientUsername);
+
+        try {
+            friendshipRepository.deleteFriendshipByRequesterIdAndRecipientId(requester.getId(), recipient.getId());
+        } catch (Exception e){
+            throw new DatabaseException("A database error occurred while trying to cancel the request.");
+        }
+        return new ResponseEntity<>("Friend request canceled!", HttpStatus.OK);
+    }
+
+    public void validateFriendRequestCancelData(String recipientUsername, HttpSession httpSession){
+        if(httpSession.getAttribute("username") == null){
+            throw new UserNotFoundException("Please log in before trying this!");
+        }
+        String requesterUsername = httpSession.getAttribute("username").toString();
+
+        User requester = userRepository.findUserByUsername(requesterUsername);
+        User recipient = userRepository.findUserByUsername(recipientUsername);
+
+        if(requester == null || recipient == null || requesterUsername.equals(recipientUsername)){
+            throw new UserNotFoundException("Something is wrong with the username/usernames");
+        }
+
+        if(!friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsTrue(requester.getId(), recipient.getId())){
+            throw new FriendshipException("No friend request found!");
+        }
+
+    }
 
     public void validateFriendshipRequestData(String recipientUsername, HttpSession httpSession) {
         //checking to see if the user is logged in
@@ -55,9 +91,13 @@ public class FriendshipService {
         if (requester == null || recipient == null || requesterUsername.equals(recipientUsername)) {
             throw new UserNotFoundException("Something is wrong with the username/usernames");
         }
+
+        if(friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndDeclinedIsTrue(requester.getId(), recipient.getId())){
+            throw new FriendshipException("Your friend request was already declined. :(");
+        }
         //making sure that the friendship doesnt already exist
         if (checkIfFriendshipExists(requester.getId(), recipient.getId())) {
-            throw new FriendshipAlreadyExistsException("Friendship or friend request already exists!");
+            throw new FriendshipException("Friendship or friend request already exists!");
         }
     }
 
@@ -85,6 +125,7 @@ public class FriendshipService {
         friendship.setPending(false);
         if(action.equals(ACTION_DECLINE)){
             friendship.setDeclined(true);
+            friendship.setDeclined_at(new Timestamp(System.currentTimeMillis()));
         }
         try {
             friendshipRepository.save(friendship);

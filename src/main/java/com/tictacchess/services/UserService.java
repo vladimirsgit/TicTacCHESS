@@ -144,6 +144,16 @@ public class UserService {
         if(friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsTrue(userToShow.getId(), userToSee.getId())){
             model.addAttribute("recipient", true);
         }
+        if(friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedIsFalse(userToShow.getId(), userToSee.getId())
+            || friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedIsFalse(userToSee.getId(), userToShow.getId())){
+            model.addAttribute("friends", true);
+        }
+        if(friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedTrue(userToShow.getId(), userToSee.getId())){
+            model.addAttribute("userToSeeDeclinedRequest", true);
+        }
+        if(friendshipRepository.existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedTrue(userToSee.getId(), userToShow.getId())){
+            model.addAttribute("userToShowDeclinedRequest", true);
+        }
         model.addAttribute("user", userDTO);
     }
 }

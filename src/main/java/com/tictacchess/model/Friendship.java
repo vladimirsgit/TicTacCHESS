@@ -3,6 +3,7 @@ package com.tictacchess.model;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -35,6 +36,7 @@ public class Friendship {
 
     private Boolean pending = true;
     private Boolean declined = false;
+    private Timestamp declined_at;
 
     public Friendship(){
 
@@ -75,4 +77,13 @@ public class Friendship {
     public void setDeclined(Boolean declined) {
         this.declined = declined;
     }
+
+    public Timestamp getDeclined_at() {
+        return declined_at;
+    }
+
+    public void setDeclined_at(Timestamp declined_at) {
+        this.declined_at = declined_at;
+    }
+
 }

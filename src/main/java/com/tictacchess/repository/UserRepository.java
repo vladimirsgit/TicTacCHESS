@@ -13,8 +13,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsUserByUsername(String username);
     User findUserByUsername(String username);
     ArrayList<User> findUsersByConfirmedEmailFalse();
-
-//    @Query("SELECT friendship FROM Friendship friendship WHERE (friendship.requesterId =:userId OR friendship.recipientId =:userId) " +
-//            "AND friendship.pending = false AND friendship.declined = false")
-//    ArrayList<Friendship> exists(Integer userId);
 }
