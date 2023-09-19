@@ -1,5 +1,6 @@
 package com.tictacchess.services;
 
+import com.tictacchess.dto.UserDTO;
 import com.tictacchess.exceptions.AddFriendException;
 import com.tictacchess.exceptions.DatabaseException;
 import com.tictacchess.exceptions.FriendshipException;
@@ -8,13 +9,17 @@ import com.tictacchess.model.Friendship;
 import com.tictacchess.model.User;
 import com.tictacchess.repository.FriendshipRepository;
 import com.tictacchess.repository.UserRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Objects;
 
 
 @Service
@@ -58,7 +63,42 @@ public class FriendshipService {
         }
         return new ResponseEntity<>("Friend request canceled!", HttpStatus.OK);
     }
+    public ResponseEntity<String> acceptFriendship(String requesterUsername, HttpSession httpSession) {
+        checkFriendshipDataAndSetNecessaryActions(requesterUsername, httpSession, ACTION_ACCEPT);
+        return new ResponseEntity<>("Friend request accepted!", HttpStatus.ACCEPTED);
+    }
 
+    public ResponseEntity<String> declineFriendship(String requesterUsername, HttpSession httpSession) {
+        checkFriendshipDataAndSetNecessaryActions(requesterUsername, httpSession, ACTION_DECLINE);
+        return new ResponseEntity<>("Friend request declined!", HttpStatus.OK);
+
+    }
+    public ResponseEntity<String> deleteFriend(String friendUsername, HttpSession httpSession){
+        Friendship friendship = validateFriendDeletionData(friendUsername, httpSession);
+        try {
+            friendshipRepository.delete(friendship);
+        } catch (Exception e){
+            throw new DatabaseException("An error occurred when trying to delete that friendship");
+        }
+        return new ResponseEntity<>("Friend deleted!", HttpStatus.OK);
+    }
+    public Friendship validateFriendDeletionData(String friendUsername, HttpSession httpSession){
+        if(httpSession.getAttribute("username") == null){
+            throw new UserNotFoundException("Please log in!");
+        }
+        User friendOf = userRepository.findUserByUsername(httpSession.getAttribute("username").toString());
+        User friend = userRepository.findUserByUsername(friendUsername);
+
+        if(friendOf == null || friend == null){
+            throw new UserNotFoundException("Something is wrong with the username/usernames");
+        }
+        Friendship friendship = friendshipRepository.friendshipToDelete(friend.getId(), friendOf.getId());
+
+        if(friendship == null){
+            throw new FriendshipException("Friendship not found.");
+        }
+        return friendship;
+    }
     public void validateFriendRequestCancelData(String recipientUsername, HttpSession httpSession){
         if(httpSession.getAttribute("username") == null){
             throw new UserNotFoundException("Please log in before trying this!");
@@ -101,16 +141,6 @@ public class FriendshipService {
         }
     }
 
-    public ResponseEntity<String> acceptFriendship(String requesterUsername, HttpSession httpSession) {
-        checkFriendshipDataAndSetNecessaryActions(requesterUsername, httpSession, ACTION_ACCEPT);
-        return new ResponseEntity<>("Friend request accepted!", HttpStatus.ACCEPTED);
-    }
-
-    public ResponseEntity<String> declineFriendship(String requesterUsername, HttpSession httpSession) {
-        checkFriendshipDataAndSetNecessaryActions(requesterUsername, httpSession, ACTION_DECLINE);
-        return new ResponseEntity<>("Friend request declined!", HttpStatus.OK);
-
-    }
 
     public void checkFriendshipDataAndSetNecessaryActions(String requesterUsername, HttpSession httpSession, String action){
         if (httpSession.getAttribute("username") == null) {
@@ -159,6 +189,49 @@ public class FriendshipService {
     public boolean checkIfFriendshipExists(Integer requesterId, Integer recipientId){
         return friendshipRepository.existsFriendshipByRecipientIdAndRequesterId(recipientId, requesterId)
                 || friendshipRepository.existsFriendshipByRecipientIdAndRequesterId(requesterId, recipientId);
+    }
+
+    public String showListOfFriends(HttpSession httpSession, Model model){
+        if(httpSession.getAttribute("username") == null){
+            return "redirect:/login";
+        }
+        ArrayList<UserDTO> friendsList = createListOfFriends(httpSession);
+        model.addAttribute("friendsList", friendsList);
+
+        return "friends";
+    }
+    public ArrayList<UserDTO> createListOfFriends(HttpSession httpSession){
+        User user = userRepository.findUserByUsername(httpSession.getAttribute("username").toString());
+        if(user == null){
+            throw new UserNotFoundException("User not found");
+        }
+
+        ArrayList<Friendship> friendships = friendshipRepository.findFriendship(user.getId());
+        ArrayList<UserDTO> friends = new ArrayList<>();
+        Integer userId = user.getId();
+
+        for(Friendship friendship:
+        friendships){
+            if(Objects.equals(friendship.getRequesterId(), userId)){
+                User friend = userRepository.findUserById(friendship.getRecipientId());
+                UserDTO userDTO = createUserDTOForFriendsList(friend);
+                friends.add(userDTO);
+            } else if(Objects.equals(friendship.getRecipientId(), userId)){
+                User friend = userRepository.findUserById(friendship.getRequesterId());
+                UserDTO userDTO = createUserDTOForFriendsList(friend);
+                friends.add(userDTO);
+            }
+        }
+        return friends;
+    }
+
+    public UserDTO createUserDTOForFriendsList(User friend){
+        UserDTO userDTO = new UserDTO();
+        userDTO.setCreatedAt(friend.getCreated_at());
+        userDTO.setRole(friend.getRole());
+        userDTO.setUsername(friend.getUsername());
+
+        return userDTO;
     }
 
 }

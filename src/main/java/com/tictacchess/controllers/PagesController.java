@@ -1,5 +1,6 @@
 package com.tictacchess.controllers;
 
+import com.tictacchess.services.FriendshipService;
 import com.tictacchess.services.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class PagesController {
 
     private final UserService userService;
-
-    public PagesController(UserService userService){
+    private final FriendshipService friendshipService;
+    public PagesController(UserService userService, FriendshipService friendshipService){
         this.userService = userService;
+        this.friendshipService = friendshipService;
     }
 
     @GetMapping(value = {"/", "/home", "/index"})
@@ -34,5 +36,10 @@ public class PagesController {
     @GetMapping("/profile/{username}")
     public String showProfileData(@PathVariable String username, HttpSession httpSession, Model model){
         return userService.whatProfileDataToShow(username, httpSession, model);
+    }
+
+    @GetMapping("/friends")
+    public String showListOfFriends(HttpSession httpSession, Model model){
+        return friendshipService.showListOfFriends(httpSession, model);
     }
 }

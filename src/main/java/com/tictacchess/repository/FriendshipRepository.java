@@ -24,4 +24,13 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Friendsh
     void deleteFriendshipByRequesterIdAndRecipientId(@Param("requesterId") Integer requesterId, @Param("recipientId") Integer recipientId);
     boolean existsFriendshipByRequesterIdAndRecipientIdAndPendingIsFalseAndDeclinedTrue(Integer requesterId, Integer recipientId);
     ArrayList<Friendship> findFriendshipsByDeclinedTrue();
+
+    @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :userId OR f.recipientId = :userId) AND f.pending = false AND f.declined = FALSE")
+    ArrayList<Friendship> findFriendship(@Param("userId") Integer userId);
+
+    //@Query("SELECT COUNT (f) > 0 FROM Friendship f WHERE (f.requesterId = :friend AND f.recipientId = :friendOf) OR (f.requesterId = :friendOf AND f.recipientId = :friend)")
+    //boolean existsFriendshipToDelete(@Param("friend") Integer friendId, @Param("friendOf") Integer friendOfId);
+
+    @Query("SELECT f FROM Friendship f WHERE (f.requesterId = :friend AND f.recipientId = :friendOf) OR (f.requesterId = :friendOf AND f.recipientId = :friend)")
+    Friendship friendshipToDelete(@Param("friend") Integer friendId, @Param("friendOf") Integer friendOfId);
 }

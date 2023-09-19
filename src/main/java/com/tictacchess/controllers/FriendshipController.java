@@ -1,12 +1,10 @@
 package com.tictacchess.controllers;
+import com.tictacchess.dto.FriendDeletionDTO;
 import com.tictacchess.dto.FriendshipRequestDTO;
 import com.tictacchess.services.FriendshipService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/friends")
@@ -35,5 +33,10 @@ public class FriendshipController {
     @PostMapping("/decline")
     public ResponseEntity<String> declineFriendship(@RequestBody FriendshipRequestDTO friendshipRequestDTO, HttpSession httpSession){
         return friendshipService.declineFriendship(friendshipRequestDTO.getRequesterUsername(), httpSession);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteFriend(@RequestBody FriendDeletionDTO friendDeletionDTO, HttpSession httpSession){
+        return friendshipService.deleteFriend(friendDeletionDTO.getFriend(), httpSession);
     }
 }
